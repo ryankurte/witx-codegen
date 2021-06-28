@@ -18,7 +18,7 @@ fn witx_parse() {
 
         println!("Parsing {}", p);
 
-        let _witx = witx::load(p).unwrap();
+        let _witx = witx_codegen::witnext::load(p).unwrap();
     }
 }
 

@@ -4,6 +4,8 @@ use std::rc::Rc;
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct ASModule {
     pub name: String,
+    pub docs: String,
+
     // TODO: fill this in
 }
 

@@ -26,6 +26,14 @@ mod zig;
 pub use crate::error::*;
 use crate::astype::ASModule;
 
+// Temporary re-export to simplify switching while working on compat
+//pub(crate) use witnext as witx;
+pub(crate) use witx0_9 as witx;
+
+pub use witnext;
+pub use witx0_9;
+
+
 /// Generator output types
 #[derive(Debug, Copy, Clone, PartialEq, Display, EnumString, EnumVariantNames)]
 #[strum(serialize_all = "snake_case")]
@@ -141,7 +149,7 @@ pub fn generate(cfg: &Config) -> Result<(), Error> {
 
     for witx_file in &cfg.witx_files {
         // Parse WITX file
-        let witx = witx::load(witx_file).unwrap();
+        let witx = crate::witx::load(witx_file).unwrap();
 
         // Create generator for the specified output type
         let generator = get_generator(cfg.module_name.as_deref(), cfg.output_type);

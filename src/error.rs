@@ -1,9 +1,9 @@
 use std::fmt;
-use witx::WitxError;
 
 #[derive(Debug)]
 pub enum Error {
-    Witx(WitxError),
+    Witnext(witnext::WitxError),
+    Witx0_9(witx0_9::WitxError),
     Io(std::io::Error),
 }
 
@@ -25,8 +25,14 @@ impl From<std::io::Error> for Error {
     }
 }
 
-impl From<WitxError> for Error {
-    fn from(e: WitxError) -> Self {
-        Self::Witx(e)
+impl From<witnext::WitxError> for Error {
+    fn from(e: witnext::WitxError) -> Self {
+        Self::Witnext(e)
+    }
+}
+
+impl From<witx0_9::WitxError> for Error {
+    fn from(e: witx0_9::WitxError) -> Self {
+        Self::Witx0_9(e)
     }
 }

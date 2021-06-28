@@ -17,10 +17,8 @@ convert_case = "0.4"
 structopt = "0.3.21"
 strum = "0.21.0"
 strum_macros = "0.21.1"
-witx = { package = "witnext", version = "0.10.0-beta3" }
-
 witx0_9 = {package = "witx", version = "0.9.0" }
-#witnext = "0.10.0-beta3"
+witnext = "0.10.0-beta3"
 
 [package.metadata.deb]
 extended-description = """\

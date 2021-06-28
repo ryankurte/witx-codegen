@@ -3,62 +3,62 @@ use std::rc::Rc;
 
 use crate::astype::*;
 
-use witx::Layout as _;
+use witnext::Layout as _;
 
-impl From<witx::IntRepr> for ASType {
-    fn from(witx: witx::IntRepr) -> Self {
+impl From<witnext::IntRepr> for ASType {
+    fn from(witx: witnext::IntRepr) -> Self {
         match witx {
-            witx::IntRepr::U8 => ASType::U8,
-            witx::IntRepr::U16 => ASType::U16,
-            witx::IntRepr::U32 => ASType::U32,
-            witx::IntRepr::U64 => ASType::U64,
+            witnext::IntRepr::U8 => ASType::U8,
+            witnext::IntRepr::U16 => ASType::U16,
+            witnext::IntRepr::U32 => ASType::U32,
+            witnext::IntRepr::U64 => ASType::U64,
         }
     }
 }
 
-impl From<&witx::BuiltinType> for ASType {
-    fn from(witx_builtin: &witx::BuiltinType) -> Self {
+impl From<&witnext::BuiltinType> for ASType {
+    fn from(witx_builtin: &witnext::BuiltinType) -> Self {
         match witx_builtin {
-            witx::BuiltinType::Char => ASType::Char32,
-            witx::BuiltinType::F32 => ASType::F32,
-            witx::BuiltinType::F64 => ASType::F64,
-            witx::BuiltinType::S8 => ASType::S8,
-            witx::BuiltinType::S16 => ASType::S16,
-            witx::BuiltinType::S32 => ASType::S32,
-            witx::BuiltinType::S64 => ASType::S64,
+            witnext::BuiltinType::Char => ASType::Char32,
+            witnext::BuiltinType::F32 => ASType::F32,
+            witnext::BuiltinType::F64 => ASType::F64,
+            witnext::BuiltinType::S8 => ASType::S8,
+            witnext::BuiltinType::S16 => ASType::S16,
+            witnext::BuiltinType::S32 => ASType::S32,
+            witnext::BuiltinType::S64 => ASType::S64,
 
-            witx::BuiltinType::U8 { lang_c_char: false } => ASType::U8,
-            witx::BuiltinType::U8 { lang_c_char: true } => ASType::Char8,
-            witx::BuiltinType::U16 => ASType::U16,
-            witx::BuiltinType::U32 {
+            witnext::BuiltinType::U8 { lang_c_char: false } => ASType::U8,
+            witnext::BuiltinType::U8 { lang_c_char: true } => ASType::Char8,
+            witnext::BuiltinType::U16 => ASType::U16,
+            witnext::BuiltinType::U32 {
                 lang_ptr_size: false,
             } => ASType::U32,
-            witx::BuiltinType::U32 {
+            witnext::BuiltinType::U32 {
                 lang_ptr_size: true,
             } => ASType::USize,
-            witx::BuiltinType::U64 => ASType::U64,
+            witnext::BuiltinType::U64 => ASType::U64,
         }
     }
 }
 
-impl From<&witx::Type> for ASType {
-    fn from(type_witx: &witx::Type) -> Self {
+impl From<&witnext::Type> for ASType {
+    fn from(type_witx: &witnext::Type) -> Self {
         match type_witx {
-            witx::Type::Builtin(witx_builtin) => ASType::from(witx_builtin),
-            witx::Type::ConstPointer(constptr_tref) => {
+            witnext::Type::Builtin(witx_builtin) => ASType::from(witx_builtin),
+            witnext::Type::ConstPointer(constptr_tref) => {
                 let pointee = ASType::from(constptr_tref);
                 ASType::ConstPtr(Rc::new(pointee))
             }
-            witx::Type::Pointer(constptr_tref) => {
+            witnext::Type::Pointer(constptr_tref) => {
                 let pointee = ASType::from(constptr_tref);
                 ASType::MutPtr(Rc::new(pointee))
             }
-            witx::Type::Handle(handle_data_type) => {
+            witnext::Type::Handle(handle_data_type) => {
                 // data type doesn't seem to be used for anything
                 let resource_name = handle_data_type.resource_id.name.as_str().to_string();
                 ASType::Handle(resource_name)
             }
-            witx::Type::Record(record) if record.is_tuple() =>
+            witnext::Type::Record(record) if record.is_tuple() =>
             // Tuple
             {
                 let mut tuple_members = vec![];
@@ -88,7 +88,7 @@ impl From<&witx::Type> for ASType {
                 }
                 ASType::Tuple(tuple_members)
             }
-            witx::Type::Record(record) if record.bitflags_repr().is_none() =>
+            witnext::Type::Record(record) if record.bitflags_repr().is_none() =>
             // Struct
             {
                 let mut struct_members = vec![];
@@ -120,7 +120,7 @@ impl From<&witx::Type> for ASType {
                 }
                 ASType::Struct(struct_members)
             }
-            witx::Type::Record(record) if record.bitflags_repr().is_some() =>
+            witnext::Type::Record(record) if record.bitflags_repr().is_some() =>
             // Constants
             {
                 let mut constants = vec![];
@@ -138,12 +138,12 @@ impl From<&witx::Type> for ASType {
                     constants,
                 })
             }
-            witx::Type::Record(record) => {
+            witnext::Type::Record(record) => {
                 dbg!(record);
                 dbg!(record.bitflags_repr());
                 unreachable!()
             }
-            witx::Type::Variant(variant)
+            witnext::Type::Variant(variant)
                 if (variant.is_enum() || variant.is_bool())
                     && variant.as_expected().is_none()
                     && variant.as_option().is_none() =>
@@ -174,7 +174,7 @@ impl From<&witx::Type> for ASType {
                     })
                 }
             }
-            witx::Type::Variant(variant)
+            witnext::Type::Variant(variant)
                 if variant.as_expected().is_none() && variant.as_option().is_some() =>
             // Option
             {
@@ -192,7 +192,7 @@ impl From<&witx::Type> for ASType {
                     type_: Rc::new(option_type),
                 })
             }
-            witx::Type::Variant(variant)
+            witnext::Type::Variant(variant)
                 if variant.as_expected().is_some() && variant.as_option().is_none() =>
             // Result
             {
@@ -222,7 +222,7 @@ impl From<&witx::Type> for ASType {
                     ok_type: Rc::new(ok_type),
                 })
             }
-            witx::Type::Variant(variant) =>
+            witnext::Type::Variant(variant) =>
             // Tagged Union
             {
                 let tag_repr = ASType::from(variant.tag_repr);
@@ -252,7 +252,7 @@ impl From<&witx::Type> for ASType {
                     max_member_size,
                 })
             }
-            witx::Type::List(items_tref) => {
+            witnext::Type::List(items_tref) => {
                 let elements_type = ASType::from(items_tref);
                 match elements_type {
                     // The "string" keyword in WITX returns a Char32, even if the actual encoding is expected to be UTF-8
@@ -260,11 +260,11 @@ impl From<&witx::Type> for ASType {
                     _ => ASType::Slice(Rc::new(elements_type)),
                 }
             }
-            witx::Type::Buffer(buffer) if buffer.out => {
+            witnext::Type::Buffer(buffer) if buffer.out => {
                 let elements_type = ASType::from(&buffer.tref);
                 ASType::WriteBuffer(Rc::new(elements_type))
             }
-            witx::Type::Buffer(buffer) => {
+            witnext::Type::Buffer(buffer) => {
                 let elements_typ = ASType::from(&buffer.tref);
                 ASType::ReadBuffer(Rc::new(elements_typ))
             }
@@ -272,11 +272,11 @@ impl From<&witx::Type> for ASType {
     }
 }
 
-impl From<&witx::TypeRef> for ASType {
-    fn from(witx_tref: &witx::TypeRef) -> Self {
+impl From<&witnext::TypeRef> for ASType {
+    fn from(witx_tref: &witnext::TypeRef) -> Self {
         match witx_tref {
-            witx::TypeRef::Value(type_witx) => ASType::from(type_witx.as_ref()),
-            witx::TypeRef::Name(alias_witx) => {
+            witnext::TypeRef::Value(type_witx) => ASType::from(type_witx.as_ref()),
+            witnext::TypeRef::Name(alias_witx) => {
                 let alias_witx = alias_witx.as_ref();
                 let alias_name = alias_witx.name.as_str().to_string();
                 let alias_target = ASType::from(&alias_witx.tref);
